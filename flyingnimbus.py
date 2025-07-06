@@ -1,2 +1,1 @@
-# import psycopg2
-# import flask
+import psycopg2 as pg2
