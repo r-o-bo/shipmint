@@ -4,16 +4,16 @@ import os
 # connection with postgres
 conn = pg2.connect(database='dvdrental', user='postgres',password='satu')
 cur = conn.cursor()
+table_list = ["actor", "film", "film_actor", "category", "film_category", "store", "inventory", "rental", "payment", "staff",
+              "customer", "address", "city", "country"]
 
-def your_query(query):
+def your_query(query: str) -> str:
     try:
-        cur.execute()
+        cur.execute(query)
         rows = cur.fetchall()
 
         # schema
-        columns = [desc[0] for desc in cur.description]
-
-        print(f"Table: {(query.split()[-1])}")
+        columns = [desc[0] for desc in cur.description] 
         print(columns)
         for item in rows:
             print(item)
@@ -22,3 +22,5 @@ def your_query(query):
         conn.close()
     except Exception as e:
         print("random error")
+
+your_query("SELECT * FROM PAYMENT LIMIT 5")
