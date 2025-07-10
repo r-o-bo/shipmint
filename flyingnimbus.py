@@ -1,21 +1,24 @@
 import psycopg2 as pg2
 import os
 
-print("hello world")
-
 # connection with postgres
 conn = pg2.connect(database='dvdrental', user='postgres',password='satu')
-
-
 cur = conn.cursor()
-cur.execute("SELECT * FROM payment")
-rows = cur.fetchmany(10)
 
-# schema
-columns = [desc[0] for desc in cur.description]
-print(columns)
-for item in rows:
-    print(item)
+def your_query(query):
+    try:
+        cur.execute()
+        rows = cur.fetchall()
 
-cur.close()
-conn.close()
+        # schema
+        columns = [desc[0] for desc in cur.description]
+
+        print(f"Table: {(query.split()[-1])}")
+        print(columns)
+        for item in rows:
+            print(item)
+
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print("random error")
