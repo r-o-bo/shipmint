@@ -23,4 +23,9 @@ def your_query(query: str) -> str:
     except Exception as e:
         print("random error")
 
-your_query("SELECT * FROM PAYMENT LIMIT 5")
+your_query("""SELECT cust.customer_id, cust.first_name, cust.last_name, SUM(pay.amount) AS total_paid
+              FROM customer cust
+              JOIN payment pay ON cust.customer_id = pay.customer_id
+              GROUP BY cust.customer_id, cust.first_name, cust.last_name
+              ORDER BY total_paid DESC
+              LIMIT 5""")
