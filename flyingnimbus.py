@@ -8,6 +8,9 @@ table_list = ["actor", "film", "film_actor", "category", "film_category", "store
               "customer", "address", "city", "country"]
 
 def your_query(query: str) -> str:
+    your_query.calls += 1
+    print(f"\n Query result {your_query.calls}:\n")
+
     try:
         cur.execute(query)
         rows = cur.fetchall()
@@ -15,17 +18,73 @@ def your_query(query: str) -> str:
         # schema
         columns = [desc[0] for desc in cur.description] 
         print(columns)
+
+        # this loop is for the tables not the calls!
         for item in rows:
             print(item)
 
-        cur.close()
-        conn.close()
     except Exception as e:
-        print("random error")
+        print(f"random error: {e}")
 
+your_query.calls = 0
+
+# Top 5 customers by Total Payment
 your_query("""SELECT cust.customer_id, cust.first_name, cust.last_name, SUM(pay.amount) AS total_paid
               FROM customer cust
               JOIN payment pay ON cust.customer_id = pay.customer_id
               GROUP BY cust.customer_id, cust.first_name, cust.last_name
               ORDER BY total_paid DESC
               LIMIT 5""")
+
+# Customers who have rented films in the 'Action' category
+your_query("""SELECT DISTINCT c.customer_id, c.first_name, c.last_name
+              FROM customer c
+              JOIN rental r ON c.customer_id = r.customer_id
+              JOIN inventory i ON r.inventory_id = i.inventory_id
+              JOIN film_category fc ON i.film_id = fc.film_id
+              JOIN category cat ON fc.category_id = cat.category_id
+              WHERE cat.name = 'Action'
+              LIMIT 5
+           
+""")
+
+# Customers who never made a payment
+your_query("""SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+LEFT JOIN payment p ON c.customer_id = p.customer_id
+WHERE p.payment_id IS NULL
+LIMIT 5
+""")
+
+# Movies that were never rented
+your_query("""SELECT f.film_id, f.title
+FROM film f
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE r.rental_id IS NULL
+LIMIT 5
+""")
+
+# Label customers based on how much money they have spent
+your_query("""SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COALESCE(SUM(p.amount), 0) AS total_paid,
+    
+    CASE 
+        WHEN COALESCE(SUM(p.amount), 0) >= 100 THEN 'High $$$'
+        WHEN COALESCE(SUM(p.amount), 0) BETWEEN 50 AND 99.99 THEN 'Medium $$'
+        WHEN COALESCE(SUM(p.amount), 0) BETWEEN 1 AND 49.99 THEN 'Low $'
+        ELSE 'No Payment'
+    END AS spending_tier
+
+FROM customer c
+LEFT JOIN payment p ON c.customer_id = p.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY total_paid DESC
+LIMIT 5
+""")
+
+cur.close()
+conn.close()
