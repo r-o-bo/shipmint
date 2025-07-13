@@ -1,5 +1,6 @@
 import psycopg2 as pg2
 import os
+import csv
 
 # connection with postgres
 conn = pg2.connect(database='dvdrental', user='postgres',password='satu')
