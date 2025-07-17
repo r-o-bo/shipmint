@@ -8,7 +8,7 @@ cur = conn.cursor()
 table_list = ["actor", "film", "film_actor", "category", "film_category", "store", "inventory", "rental", "payment", "staff",
               "customer", "address", "city", "country"]
 
-def your_query(query: str) -> str:
+def your_query(query: str, filename: str = None) -> str:
     your_query.calls += 1
     print(f"\n Query result {your_query.calls}:\n")
 
@@ -24,8 +24,19 @@ def your_query(query: str) -> str:
         for item in rows:
             print(item)
 
+        if filename:
+            with open(filename,"w", newline="") as csv_file:
+                writer = csv.writer(csv_file)
+                writer.writerow(columns) # for schema
+                writer.writerows(rows) # data
+            print(f"Data exported to {filename}")
+        
+        return rows, columns
+
+
     except Exception as e:
         print(f"random error: {e}")
+
 
 your_query.calls = 0
 
@@ -35,7 +46,7 @@ your_query("""SELECT cust.customer_id, cust.first_name, cust.last_name, SUM(pay.
               JOIN payment pay ON cust.customer_id = pay.customer_id
               GROUP BY cust.customer_id, cust.first_name, cust.last_name
               ORDER BY total_paid DESC
-              LIMIT 5""")
+              LIMIT 5""", "top5.csv")
 
 # Customers who have rented films in the 'Action' category
 your_query("""SELECT DISTINCT c.customer_id, c.first_name, c.last_name
@@ -45,9 +56,8 @@ your_query("""SELECT DISTINCT c.customer_id, c.first_name, c.last_name
               JOIN film_category fc ON i.film_id = fc.film_id
               JOIN category cat ON fc.category_id = cat.category_id
               WHERE cat.name = 'Action'
-              LIMIT 5
-           
-""")
+              LIMIT 5        
+""","action.csv")
 
 # Customers who never made a payment
 your_query("""SELECT c.customer_id, c.first_name, c.last_name
@@ -55,7 +65,7 @@ FROM customer c
 LEFT JOIN payment p ON c.customer_id = p.customer_id
 WHERE p.payment_id IS NULL
 LIMIT 5
-""")
+""","nopayment.csv")
 
 # Movies that were never rented
 your_query("""SELECT f.film_id, f.title
@@ -64,7 +74,7 @@ LEFT JOIN inventory i ON f.film_id = i.film_id
 LEFT JOIN rental r ON i.inventory_id = r.inventory_id
 WHERE r.rental_id IS NULL
 LIMIT 5
-""")
+""","norent.csv")
 
 # Label customers based on how much money they have spent
 your_query("""SELECT 
@@ -85,7 +95,7 @@ LEFT JOIN payment p ON c.customer_id = p.customer_id
 GROUP BY c.customer_id, c.first_name, c.last_name
 ORDER BY total_paid DESC
 LIMIT 5
-""")
+""","spending_tiers.csv")
 
 cur.close()
 conn.close()
