@@ -1,9 +1,18 @@
 import psycopg2 as pg2
 import os
 import csv
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # connection with postgres
-conn = pg2.connect(database='dvdrental', user='postgres',password='satu')
+conn = pg2.connect(
+    host=os.getenv('DB_HOST'),
+    database=os.getenv('DB_NAME'),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASSWORD')
+)
+
 cur = conn.cursor()
 table_list = ["actor", "film", "film_actor", "category", "film_category", "store", "inventory", "rental", "payment", "staff",
               "customer", "address", "city", "country"]
@@ -29,7 +38,7 @@ def your_query(query: str, filename: str = None) -> str:
                 writer = csv.writer(csv_file)
                 writer.writerow(columns) # for schema
                 writer.writerows(rows) # data
-            print(f"Data exported to {filename}")
+            print(f"\nData exported to {filename}\n")
         
         return rows, columns
 
@@ -99,3 +108,5 @@ LIMIT 5
 
 cur.close()
 conn.close()
+
+# bhai kya tatti banaya hai maine
