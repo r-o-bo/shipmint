@@ -7,13 +7,16 @@ load_dotenv()
 
 # connection with postgres
 def get_connection():
-    conn = pg2.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASSWORD')
-    )
-    return conn, conn.cursor()
+    try:
+        conn = pg2.connect(
+            host=os.getenv("DB_HOST", "localhost"),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
+        )
+        return conn, conn.cursor()
+    except Exception as e:
+        print(f"Error: {e}")
 
 table_list = ["actor", "film", "film_actor", "category", "film_category", "store", "inventory", "rental", "payment", "staff",
               "customer", "address", "city", "country"]
