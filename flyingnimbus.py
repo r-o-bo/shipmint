@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# sanity check
+print("Script running...\n")
+
 # connection with postgres
 def get_connection():
     try:
@@ -117,14 +120,5 @@ if __name__ == "__main__":
 
     cur.close()
     conn.close()
-
-
-
-
-
-
-
-
-
 
 # hellll yeahh prod worthy babyyy
