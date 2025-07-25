@@ -1,23 +1,38 @@
-name: Build and Push Docker Image to ACR
+name: CI/CD Pipeline – Build and Deploy to Azure
 
 on:
   push:
-    branches: [ master ]
-
+    branches: [ master ]  
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Docker Login to Azure Container Registry
-        run: |
-          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+    - name: Log in to Azure Container Registry
+      run: echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
 
-      - name: Build Docker Image
-        run: docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest .
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest .
 
-      - name: Push Docker Image
-        run: docker push ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest
+    - name: Push image to ACR
+      run: docker push ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest
+
+    - name: Deploy to Azure Container Instance
+      uses: azure/aci-deploy@v1
+      with:
+        resource-group: flyingnimbus-rg
+        name: shipmint-container
+        image: ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest
+        registry-login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+        registry-username: ${{ secrets.ACR_USERNAME }}
+        registry-password: ${{ secrets.ACR_PASSWORD }}
+        dns-name-label: shipmint-deploy
+        location: centralindia
+        environment-variables: |
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
