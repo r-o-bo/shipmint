@@ -134,8 +134,8 @@ if __name__ == "__main__":
     print("\nClosing connections...")
 
     # logs check
-    print("Sleeping 60 seconds to prevent early container shutdown...")
-    time.sleep(60)
+    print("Sleeping 15 seconds to prevent early container shutdown...")
+    time.sleep(15)
 
     print("Script finished.")
 
