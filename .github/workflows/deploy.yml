@@ -48,6 +48,7 @@ jobs:
           --image ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest \
           --cpu 1 \
           --memory 1.5 \
+          --os-type Linux \
           --restart-policy Never \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
