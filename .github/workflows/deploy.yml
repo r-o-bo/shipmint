@@ -78,9 +78,9 @@ jobs:
         sleep 10
         done
 
-  #  - name: Delete container after execution (cleanup)
-  #    run: |
-  #      az container delete \
-  #        --name ${{ secrets.ACI_NAME }} \
-  #        --resource-group ${{ secrets.AZURE_RG }} \
-  #        --yes
+    - name: Delete container after execution (cleanup)
+      run: |
+        az container delete \
+          --name ${{ secrets.ACI_NAME }} \
+          --resource-group ${{ secrets.AZURE_RG }} \
+          --yes
