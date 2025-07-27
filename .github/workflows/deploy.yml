@@ -62,11 +62,21 @@ jobs:
     - name: Wait for container to finish 
       run: |
         echo "Waiting for ACI to finish..."
-        az container wait \
-          --name ${{ secrets.ACI_NAME }} \
-          --resource-group ${{ secrets.AZURE_RG }} \
-          --custom "instanceView.state=='Terminated'" \
-          --interval 10
+        for i in {1..30}; do
+        STATUS=$(az container show \
+            --name ${{ secrets.ACI_NAME }} \
+            --resource-group ${{ secrets.AZURE_RG }} \
+            --query "instanceView.state" \
+            --output tsv)
+
+        echo "Current status: $STATUS"
+
+        if [ "$STATUS" = "Terminated" ] || [ "$STATUS" = "Succeeded" ] || [ "$STATUS" = "Failed" ]; then
+            break
+        fi
+
+        sleep 10
+        done
 
     - name: Delete container after execution (cleanup)
       run: |
