@@ -23,6 +23,7 @@ def get_connection():
         print(f"Database connection error: {e}")
         return None, None
 
+# table list so i dont forget
 table_list = [
     "actor", "film", "film_actor", "category", "film_category",
     "store", "inventory", "rental", "payment", "staff",
