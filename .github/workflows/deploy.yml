@@ -1,0 +1,71 @@
+name: my pipeline
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Docker login to ACR
+      run: echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+
+    - name: Build image
+      run: docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest .
+
+    - name: Push image
+      run: docker push ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest
+
+    - name: Delete existing container if exists
+      continue-on-error: true
+      run: |
+        az container delete \
+          --name ${{ secrets.ACI_NAME }} \
+          --resource-group ${{ secrets.AZURE_RG }} \
+          --yes
+
+    - name: Create ACI container
+      run: |
+        az container create \
+          --resource-group ${{ secrets.AZURE_RG }} \
+          --name ${{ secrets.ACI_NAME }} \
+          --image ${{ secrets.ACR_LOGIN_SERVER }}/shipmint:latest \
+          --cpu 1 \
+          --memory 1.5 \
+          --restart-policy Never \
+          --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+          --registry-username ${{ secrets.ACR_USERNAME }} \
+          --registry-password ${{ secrets.ACR_PASSWORD }} \
+          --environment-variables \
+            DB_HOST=${{ secrets.DB_HOST }} \
+            DB_NAME=${{ secrets.DB_NAME }} \
+            DB_USER=${{ secrets.DB_USER }} \
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+    - name: Wait for container to finish 
+      run: |
+        echo "Waiting for ACI to finish..."
+        az container wait \
+          --name ${{ secrets.ACI_NAME }} \
+          --resource-group ${{ secrets.AZURE_RG }} \
+          --custom "instanceView.state=='Terminated'" \
+          --interval 10
+
+    - name: Delete container after execution (cleanup)
+      run: |
+        az container delete \
+          --name ${{ secrets.ACI_NAME }} \
+          --resource-group ${{ secrets.AZURE_RG }} \
+          --yes
