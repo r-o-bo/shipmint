@@ -1,6 +1,6 @@
 
 # Shipmint
-Shipmint is a Python data querying and export tool built for running analytical SQL queries on the [dvdrental](https://neon.com/postgresql/postgresql-getting-started/postgresql-sample-database) dataset. It connects to a PostgreSQL database, executes pre-defined queries, and exports the results to CSV files.
+Shipmint is a data querying and export tool built with Python for running analytical SQL queries on the [dvdrental](https://neon.com/postgresql/postgresql-getting-started/postgresql-sample-database) dataset. It connects to a PostgreSQL database, executes pre-defined queries, and exports the results to CSV files.
 
 This project includes a working **Continuous Integration and Continuous Delivery (CI/CD) pipeline** using GitHub Actions that builds and pushes a Docker image to **Azure Container Registry** and deploys it via **Azure Container Instances**.
 
@@ -40,11 +40,11 @@ shipmint/
 - **GitHub Actions**: CI/CD pipeline<br> 
 
 ### Python libraries used:<br> 
-- **psycopg2** – Used to connect and interact with the PostgreSQL database.<br> 
-- **os** – Handles interaction with the operating system, such as environment variables and file paths.<br> 
-- **csv** – Used for reading and writing CSV files, primarily for data export/import.<br> 
-- **time** – Utilized during development and testing for adding delays (for stuff like while waiting for Azure containers or services to be ready).<br> 
-- **dotenv** – Loads environment variables from a .env file, for keeping sensitive configs like db credentials out of source code.<br> 
+- `psycopg2` – Used to connect and interact with the PostgreSQL database.<br> 
+- `os` – Handles interaction with the operating system, such as environment variables and file paths.<br> 
+- `csv` – Used for reading and writing CSV files, primarily for data export/import.<br> 
+- `time` – Utilized during development and testing for adding delays (for stuff like while waiting for Azure containers or services to be ready).<br> 
+- `dotenv` – Loads environment variables from a .env file, for keeping sensitive configs like db credentials out of source code.<br> 
 
 
 
@@ -94,6 +94,8 @@ AZURE_SUBSCRIPTION_ID
 ACI_NAME
 ```
 
+
+
 ---
 
 ## 🔧 CI/CD Pipeline
@@ -106,6 +108,15 @@ On push to master, the GitHub Actions workflow will:
 4. Deploy a new container to ACI.
 5. Wait for the container to finish execution.
 6. Delete the container (optional cleanup).
+
+<p align="center">
+  <img src="assets/azure1.png" alt="Azure1" width="800"/>
+</p>
+
+<p align="center">
+  <img src="assets/azure2.png" alt="Azure2" width="800"/>
+</p>
+
 ---
 
 ## 📜 License
