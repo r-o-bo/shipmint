@@ -12,7 +12,7 @@ This project includes a working **Continuous Integration and Continuous Delivery
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```bash
 .
@@ -30,7 +30,7 @@ shipmint/
 
 ---
 
-## ⚙️ Features and Technologies:
+##  Features and Technologies:
 
 - **Python**: Scripting and data transformation<br> 
 - **PostgreSQL**: Data storage (hosted on Azure)<br> 
@@ -68,7 +68,7 @@ DB_PASSWORD=your_password
 
 ---
 
-## :whale: Running with Docker
+## Running with Docker
 
 ```bash
 docker build -t flying-nimbus .
@@ -98,7 +98,7 @@ ACI_NAME
 
 ---
 
-## 🔧 CI/CD Pipeline
+##  CI/CD Pipeline
 
 
 On push to master, the GitHub Actions workflow will:
@@ -119,6 +119,6 @@ On push to master, the GitHub Actions workflow will:
 
 ---
 
-## 📜 License
+##  License
 This project is licensed under the MIT License.
 
